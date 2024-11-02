@@ -1,35 +1,55 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { ChangeEventHandler, MouseEventHandler, useRef, useState } from 'react';
+import SciChart, { SciChartComponentAPI } from './SciChart';
+import { createChart } from './chart-configurations';
+import { ISciChartSurfaceBase, MemoryUsageHelper, SciChartSurface } from 'scichart';
+import ChartComponent from './Bubble3DChart';
 
+// SciChartSurface.autoDisposeWasmContext = true;
+MemoryUsageHelper.isMemoryUsageDebugEnabled = true;
+
+//Awaited<ReturnType<TInitFunction>>['sciChartSurface']  extends ISciChartSurfaceBase
+// type TChartAPI<TInitFunction> = 'sciChartSurface' keyof Awaited<ReturnType<TInitFunction>>
+// ? SciChartComponentAPI<
+//     Awaited<ReturnType<TInitFunction>>['sciChartSurface'],
+//     Awaited<ReturnType<TInitFunction>>
+//     : never
+// >;
+type TChartAPI = SciChartComponentAPI<
+    Awaited<ReturnType<typeof createChart>>['sciChartSurface'],
+    Awaited<ReturnType<typeof createChart>>
+>;
 function App() {
-  const [count, setCount] = useState(0)
+    // const chartRef = useRef<SciChartComponentAPI<TSurf, TInitResult>>(null);
+    const chartRef = useRef<any>(null);
+    const [drawChart, setDrawChart] = useState(true);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const handleCheckbox: ChangeEventHandler<HTMLInputElement> = (e) => {
+        setDrawChart(e.target.checked);
+    };
+
+    const handleClick: MouseEventHandler<HTMLInputElement> = () => {
+        // @ts-ignore
+        window.gc && window.gc();
+        const state = MemoryUsageHelper.objectRegistry.getState();
+        console.log('state', state);
+        // chartRef.current.sciChartSurface;
+        // chartRef.current.customChartProperties.startDemo();
+    };
+
+    return (
+        <div className='App'>
+            <header className='App-header'>
+                <h1>SciChart.js with React</h1>
+                <p>In this example we setup webpack, scichart, react and create a simple chart with one X and Y axis</p>
+            </header>
+            <input type='checkbox' checked={drawChart} onChange={handleCheckbox} /> Show Chart
+            <br />
+            <input type='button' onClick={handleClick} value='Log Object Registry State'></input>
+            <ChartComponent/>
+            {/* {drawChart ? <SciChart ref={chartRef} initChart={createChart} style={{ width: 800, height: 600 }} /> : null} */}
+            {/* {drawChart ? <SciChart initChart={createChart} style={{ width: 800, height: 600 }} /> : null} */}
+        </div>
+    );
 }
 
-export default App
+export default App;
