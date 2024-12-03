@@ -1,0 +1,106 @@
+[
+    {
+        "name": "german_shepherd.jpg",
+        "desciption": null,
+        "prediction": "German shepherd",
+        "x": 23.5,
+        "y": 56.2,
+        "z": 19.8
+    },
+    {
+        "name": "golden_retriever.jpg",
+        "desciption": null,
+        "prediction": "Golden retriever",
+        "x": 12.1,
+        "y": 48.9,
+        "z": 36.4
+    },
+    {
+        "name": "labrador_retriever.jpg",
+        "desciption": null,
+        "prediction": "Labrador retriever",
+        "x": 78.3,
+        "y": 22.7,
+        "z": 14.9
+    },
+    {
+        "name": "poodle.jpg",
+        "desciption": null,
+        "prediction": "Poodle",
+        "x": 32.8,
+        "y": 61.4,
+        "z": 7.2
+    },
+    {
+        "name": "rottweiler.jpg",
+        "desciption": null,
+        "prediction": "Rottweiler",
+        "x": 54.6,
+        "y": 13.7,
+        "z": 45.9
+    },
+    {
+        "name": "siberian_husky.jpg",
+        "desciption": null,
+        "prediction": "Siberian husky",
+        "x": 10.4,
+        "y": 72.1,
+        "z": 24.8
+    },
+    {
+        "name": "yorkshire_terrier.jpg",
+        "desciption": null,
+        "prediction": "Yorkshire terrier",
+        "x": 17.3,
+        "y": 89.5,
+        "z": 30.2
+    },
+    {
+        "name": "beagle.jpg",
+        "desciption": null,
+        "prediction": "beagle",
+        "x": 41.2,
+        "y": 37.8,
+        "z": 66.9
+    },
+    {
+        "name": "boxer.jpg",
+        "desciption": null,
+        "prediction": "boxer",
+        "x": 29.1,
+        "y": 53.2,
+        "z": 9.4
+    },
+    {
+        "name": "chihuahua.jpg",
+        "desciption": null,
+        "prediction": "chihuahua",
+        "x": 5.7,
+        "y": 27.3,
+        "z": 74.8
+    },
+    {
+        "name": "dalmatian.jpg",
+        "desciption": null,
+        "prediction": "dalmatian",
+        "x": 38.4,
+        "y": 66.1,
+        "z": 20.5
+    },
+    {
+        "name": "doberman.jpg",
+        "desciption": null,
+        "prediction": "doberman",
+        "x": 70.2,
+        "y": 15.6,
+        "z": 49.3
+    },
+    {
+        "name": "french_bulldog.jpg",
+        "desciption": null,
+        "prediction": "french bulldog",
+        "x": 19.9,
+        "y": 42.7,
+        "z": 8.8
+    }
+]
