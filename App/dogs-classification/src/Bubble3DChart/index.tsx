@@ -1,6 +1,6 @@
 import { SciChartReact } from "scichart-react";
 import classes from "./Examples.module.scss";
-import { drawExample } from "./drawExample";
+import { drawExample } from "./dogsChart";
 
 // React component needed as our examples app is react.
 // SciChart can be used in Angular, Vue, Blazor and vanilla JS! See our Github repo for more info

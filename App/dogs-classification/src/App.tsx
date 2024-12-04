@@ -3,6 +3,7 @@ import SciChart, { SciChartComponentAPI } from './SciChart';
 import { createChart } from './chart-configurations';
 import { ISciChartSurfaceBase, MemoryUsageHelper, SciChartSurface } from 'scichart';
 import ChartComponent from './Bubble3DChart';
+import { fetchData } from './ApiService';
 
 // SciChartSurface.autoDisposeWasmContext = true;
 MemoryUsageHelper.isMemoryUsageDebugEnabled = true;
@@ -38,16 +39,7 @@ function App() {
 
     return (
         <div className='App'>
-            <header className='App-header'>
-                <h1>SciChart.js with React</h1>
-                <p>In this example we setup webpack, scichart, react and create a simple chart with one X and Y axis</p>
-            </header>
-            <input type='checkbox' checked={drawChart} onChange={handleCheckbox} /> Show Chart
-            <br />
-            <input type='button' onClick={handleClick} value='Log Object Registry State'></input>
             <ChartComponent/>
-            {/* {drawChart ? <SciChart ref={chartRef} initChart={createChart} style={{ width: 800, height: 600 }} /> : null} */}
-            {/* {drawChart ? <SciChart initChart={createChart} style={{ width: 800, height: 600 }} /> : null} */}
         </div>
     );
 }

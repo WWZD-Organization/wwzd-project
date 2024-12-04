@@ -1,4 +1,4 @@
-import { drawExample } from "./drawExample";
+import { drawExample } from "./dogsChart";
 
 /**
  * Creates charts on the provided root elements

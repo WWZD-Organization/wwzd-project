@@ -1,5 +1,5 @@
 import { appTheme } from "./theme";
-import { populationData, PopulationData } from "./data";
+// import { dogsData } from "./data";
 
 import {
     SciChart3DSurface,
@@ -20,6 +20,9 @@ import {
     TooltipSvgAnnotation3D,
     XyzSeriesInfo3D,
 } from "scichart";
+import { Point } from "../interfaces/Point";
+import { fetchData } from "../ApiService";
+import { ApiResponse } from "../interfaces/ApiResponse";
 
 type TMetadata = {
     country: string;
@@ -51,9 +54,9 @@ export const drawExample = async (rootElement: string | HTMLDivElement) => {
         if (seriesInfo && seriesInfo.isHit) {
             const md = (seriesInfo as XyzSeriesInfo3D).pointMetadata as TMetadata;
             valuesWithLabels.push(md.country);
-            valuesWithLabels.push(`Life Expectancy: ${seriesInfo.xValue}`);
-            valuesWithLabels.push(`GDP Per Capita: ${seriesInfo.yValue}`);
-            valuesWithLabels.push(`Year: ${seriesInfo.zValue}`);
+            valuesWithLabels.push(`X: ${seriesInfo.xValue}`);
+            valuesWithLabels.push(`Y: ${seriesInfo.yValue}`);
+            valuesWithLabels.push(`Z: ${seriesInfo.zValue}`);
         }
         return valuesWithLabels;
     };
@@ -69,30 +72,27 @@ export const drawExample = async (rootElement: string | HTMLDivElement) => {
     sciChart3DSurface.chartModifiers.add(tooltipModifier);
 
     sciChart3DSurface.xAxis = new NumericAxis3D(wasmContext, {
-        axisTitle: "Life Expectancy",
-        visibleRange: new NumberRange(30, 85),
+        axisTitle: "X",
+        visibleRange: new NumberRange(0, 100),
     });
     sciChart3DSurface.yAxis = new NumericAxis3D(wasmContext, {
-        axisTitle: "Gdp Per Capita",
-        visibleRange: new NumberRange(0, 50000),
+        axisTitle: "Y",
+        visibleRange: new NumberRange(0, 100),
     });
     sciChart3DSurface.zAxis = new NumericAxis3D(wasmContext, {
-        axisTitle: "Year",
-        visibleRange: new NumberRange(1950, 2010),
+        axisTitle: "Z",
+        visibleRange: new NumberRange(0, 100),
     });
 
-    // Population dataset from gapminderdata
-    // data format example = [
-    //    { country: "Afghanistan", year: 1952, population: 8425333, continent: "Asia", lifeExpectancy: 28.801, gdpPerCapita: 779.4453145 },
-    // ]
-    const year = populationData.map((item) => item.year);
-    const population = populationData.map((item) => item.population);
-    const lifeExpectancy = populationData.map((item) => item.lifeExpectancy);
-    const gdpPerCapita = populationData.map((item) => item.gdpPerCapita);
+    const response: ApiResponse = await fetchData();
+    const dogsData = response.data;
 
-    // Metadata in scichart.js 3D controls color and scale of a bubble. It can also hold additional optional properties
-    // Below we format the data for lifeExpectancy into metadata colour coded and scaled depending on the value
-    const metadata = formatMetadata(populationData, [
+    const x = dogsData.map((item) => item.x);
+    const y = dogsData.map((item) => item.y);
+    const z = dogsData.map((item) => item.z);
+    // const name = dogsData.map((item) => item.name);
+
+    const metadata = formatMetadata(dogsData, [
         { offset: 1, color: appTheme.VividPink },
         { offset: 0.9, color: appTheme.VividOrange },
         { offset: 0.7, color: appTheme.MutedRed },
@@ -105,9 +105,9 @@ export const drawExample = async (rootElement: string | HTMLDivElement) => {
     sciChart3DSurface.renderableSeries.add(
         new ScatterRenderableSeries3D(wasmContext, {
             dataSeries: new XyzDataSeries3D(wasmContext, {
-                xValues: lifeExpectancy,
-                yValues: gdpPerCapita,
-                zValues: year,
+                xValues: x,
+                yValues: y,
+                zValues: z,
                 metadata,
             }),
             pointMarker: new SpherePointMarker3D(wasmContext, { size: 10 }),
@@ -118,8 +118,8 @@ export const drawExample = async (rootElement: string | HTMLDivElement) => {
     return { sciChartSurface: sciChart3DSurface };
 };
 
-function formatMetadata(population: PopulationData[], gradientStops: TGradientStop[]): TMetadata[] {
-    const valuesArray = populationData.map((item) => item.lifeExpectancy);
+function formatMetadata(dogsData: Point[], gradientStops: TGradientStop[]): TMetadata[] {
+    const valuesArray = dogsData.map((item) => item.x);
     const low = Math.min(...valuesArray);
     const high = Math.max(...valuesArray);
 
@@ -127,8 +127,8 @@ function formatMetadata(population: PopulationData[], gradientStops: TGradientSt
     // Compute a scaling factor from 0...1 where values in valuesArray at the lower end correspond to 0 and
     // values at the higher end correspond to 1
     const metaData: TMetadata[] = [];
-    for (const item of population) {
-        const x = item.lifeExpectancy;
+    for (const item of dogsData) {
+        const x = item.x;
         // scale from 0..1 for the values
         const valueScale = (x - low) / (high - low);
         // Find the nearest gradient stop index
@@ -137,7 +137,7 @@ function formatMetadata(population: PopulationData[], gradientStops: TGradientSt
         // work out the colour of this point
         const color = sGradientStops[index].color;
         const vertexColor = parseColorToUIntArgb(color);
-        metaData.push({ country: item.country, pointScale: 0.1 + valueScale, vertexColor, color });
+        metaData.push({ country: item.name, pointScale: 1 + valueScale, vertexColor, color });
     }
     return metaData;
 }
