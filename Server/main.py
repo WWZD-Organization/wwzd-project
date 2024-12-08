@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 import json
 import random
 from flask_cors import CORS
@@ -13,9 +13,9 @@ def index():
 
 
 @app.route("/api/v1/data", methods=["GET"])
-def home():
+def init_data():
     data = []
-    with open("data.json", "r") as file:
+    with open("./content/images.json", "r") as file:
         data = json.load(file)
 
     return jsonify({
@@ -24,7 +24,7 @@ def home():
 
 
 @app.route("/api/v1/data", methods=["POST"])
-def hello():
+def get_output():
     data = request.form
     name = data.get("name")
     description = data.get("description")
@@ -47,6 +47,9 @@ def hello():
 
     return jsonify(response)
 
+@app.route("/api/v1/images/<filename>", methods=["GET"])
+def get_image(filename):
+    return send_from_directory('content/images', filename)
 
 if __name__ == "__main__":
     app.run(port=3000, debug=True)
