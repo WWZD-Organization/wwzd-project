@@ -17,7 +17,8 @@
     overflow: hidden;
     position: relative;
     touch-action: none;
-    aspect-ratio: 16 / 11;
+    max-width: 80%;
+    aspect-ratio: 5 / 3;
     img {
         display: block;
     }

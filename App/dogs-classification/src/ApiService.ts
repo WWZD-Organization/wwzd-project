@@ -1,10 +1,9 @@
-import { ApiResponse } from "./interfaces/ApiResponse";
-
-const baseURL = 'http://127.0.0.1:3000/api/v1/data';
+import { ApiResponse } from "./interfaces";
+import Constants from "./utils/Constants";
 
 export async function fetchData(): Promise<ApiResponse> {
   try {
-    const response = await fetch(`${baseURL}`, {
+    const response = await fetch(`${Constants.BaseApiUrl}/data`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -18,4 +17,8 @@ export async function fetchData(): Promise<ApiResponse> {
   } catch (error) {
     throw error;
   }
+}
+
+export function getImageUrl(id: string): string {
+  return `${Constants.BaseApiUrl}/images/${id}`;
 }

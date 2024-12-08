@@ -1,5 +1,5 @@
-import { Point } from ".";
+import { DataPoint } from ".";
 
 export interface ApiResponse {
-    data: Point[];
+    data: DataPoint[];
 }

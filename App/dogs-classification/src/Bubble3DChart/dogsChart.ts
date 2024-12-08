@@ -1,5 +1,4 @@
 import { appTheme } from "./theme";
-// import { dogsData } from "./data";
 
 import {
     SciChart3DSurface,
@@ -20,7 +19,7 @@ import {
     TooltipSvgAnnotation3D,
     XyzSeriesInfo3D,
 } from "scichart";
-import { Point } from "../interfaces/Point";
+import { DataPoint } from "../interfaces/DataPoint";
 import { fetchData } from "../ApiService";
 import { ApiResponse } from "../interfaces/ApiResponse";
 
@@ -31,9 +30,7 @@ type TMetadata = {
     pointScale: number;
 };
 
-// SCICHART CODE
-
-export const drawExample = async (rootElement: string | HTMLDivElement) => {
+export const drawInitData = async (rootElement: string | HTMLDivElement) => {
     const { sciChart3DSurface, wasmContext } = await SciChart3DSurface.create(rootElement, {
         theme: appTheme.SciChartJsTheme,
     });
@@ -73,15 +70,15 @@ export const drawExample = async (rootElement: string | HTMLDivElement) => {
 
     sciChart3DSurface.xAxis = new NumericAxis3D(wasmContext, {
         axisTitle: "X",
-        visibleRange: new NumberRange(0, 100),
+        visibleRange: new NumberRange(-50, 50),
     });
     sciChart3DSurface.yAxis = new NumericAxis3D(wasmContext, {
         axisTitle: "Y",
-        visibleRange: new NumberRange(0, 100),
+        visibleRange: new NumberRange(-50, 50),
     });
     sciChart3DSurface.zAxis = new NumericAxis3D(wasmContext, {
         axisTitle: "Z",
-        visibleRange: new NumberRange(0, 100),
+        visibleRange: new NumberRange(-50, 50),
     });
 
     const response: ApiResponse = await fetchData();
@@ -118,7 +115,7 @@ export const drawExample = async (rootElement: string | HTMLDivElement) => {
     return { sciChartSurface: sciChart3DSurface };
 };
 
-function formatMetadata(dogsData: Point[], gradientStops: TGradientStop[]): TMetadata[] {
+function formatMetadata(dogsData: DataPoint[], gradientStops: TGradientStop[]): TMetadata[] {
     const valuesArray = dogsData.map((item) => item.x);
     const low = Math.min(...valuesArray);
     const high = Math.max(...valuesArray);

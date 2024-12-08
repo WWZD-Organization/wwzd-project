@@ -1,11 +1,11 @@
-import { drawExample } from "./dogsChart";
+import { drawInitData } from "./dogsChart";
 
 /**
  * Creates charts on the provided root elements
  * @returns cleanup function
  */
 const create = async () => {
-    const { sciChartSurface } = await drawExample("chart");
+    const { sciChartSurface } = await drawInitData("chart");
 
     const destructor = () => {
         sciChartSurface.delete();
