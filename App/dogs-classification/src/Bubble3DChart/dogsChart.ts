@@ -18,22 +18,25 @@ import {
     SeriesInfo3D,
     TooltipSvgAnnotation3D,
     XyzSeriesInfo3D,
+    ModifierMouseArgs,
 } from "scichart";
 import { DataPoint } from "../interfaces/DataPoint";
 import { fetchData } from "../ApiService";
 import { ApiResponse } from "../interfaces/ApiResponse";
 
-type TMetadata = {
-    country: string;
+interface  TMetadata extends DataPoint  {
     color: string;
     vertexColor: number;
     pointScale: number;
 };
 
 export const drawInitData = async (rootElement: string | HTMLDivElement) => {
+    SciChart3DSurface.UseCommunityLicense();
+
     const { sciChart3DSurface, wasmContext } = await SciChart3DSurface.create(rootElement, {
         theme: appTheme.SciChartJsTheme,
     });
+    
     sciChart3DSurface.camera = new CameraController(wasmContext, {
         position: new Vector3(-141.6, 310.29, 393.32),
         target: new Vector3(0, 50, 0),
@@ -42,21 +45,28 @@ export const drawInitData = async (rootElement: string | HTMLDivElement) => {
     sciChart3DSurface.chartModifiers.add(
         new MouseWheelZoomModifier3D(),
         new OrbitModifier3D(),
-        new ResetCamera3DModifier()
+        new ResetCamera3DModifier(),
     );
 
     const tooltipModifier = new TooltipModifier3D({ tooltipLegendOffsetX: 10, tooltipLegendOffsetY: 10 });
-    tooltipModifier.tooltipDataTemplate = (seriesInfo: SeriesInfo3D, svgAnnotation: TooltipSvgAnnotation3D) => {
+    tooltipModifier.tooltipDataTemplate = (seriesInfo: SeriesInfo3D) => {
         const valuesWithLabels: string[] = [];
         if (seriesInfo && seriesInfo.isHit) {
             const md = (seriesInfo as XyzSeriesInfo3D).pointMetadata as TMetadata;
-            valuesWithLabels.push(md.country);
+            console.log(md)
+            valuesWithLabels.push(md.name);
             valuesWithLabels.push(`X: ${seriesInfo.xValue}`);
             valuesWithLabels.push(`Y: ${seriesInfo.yValue}`);
             valuesWithLabels.push(`Z: ${seriesInfo.zValue}`);
         }
         return valuesWithLabels;
     };
+
+    // tooltipModifier.modifierMouseEnter = (args) => {
+        // console.log(args);
+    // }
+
+
     const defaultTemplate = tooltipModifier.tooltipSvgTemplate;
     tooltipModifier.tooltipSvgTemplate = (seriesInfo: SeriesInfo3D, svgAnnotation: TooltipSvgAnnotation3D) => {
         if (seriesInfo) {
@@ -81,13 +91,14 @@ export const drawInitData = async (rootElement: string | HTMLDivElement) => {
         visibleRange: new NumberRange(-50, 50),
     });
 
+
     const response: ApiResponse = await fetchData();
     const dogsData = response.data;
 
     const x = dogsData.map((item) => item.x);
     const y = dogsData.map((item) => item.y);
     const z = dogsData.map((item) => item.z);
-    // const name = dogsData.map((item) => item.name);
+    const name = dogsData.map((item) => item.name);
 
     const metadata = formatMetadata(dogsData, [
         { offset: 1, color: appTheme.VividPink },
@@ -115,26 +126,20 @@ export const drawInitData = async (rootElement: string | HTMLDivElement) => {
     return { sciChartSurface: sciChart3DSurface };
 };
 
-function formatMetadata(dogsData: DataPoint[], gradientStops: TGradientStop[]): TMetadata[] {
+function formatMetadata(dogsData: DataPoint[], gradientStops: TGradientStop[]){
     const valuesArray = dogsData.map((item) => item.x);
     const low = Math.min(...valuesArray);
     const high = Math.max(...valuesArray);
 
     const sGradientStops = gradientStops.sort((a, b) => (a.offset > b.offset ? 1 : -1));
-    // Compute a scaling factor from 0...1 where values in valuesArray at the lower end correspond to 0 and
-    // values at the higher end correspond to 1
-    const metaData: TMetadata[] = [];
+    const metaData = [];
     for (const item of dogsData) {
         const x = item.x;
-        // scale from 0..1 for the values
         const valueScale = (x - low) / (high - low);
-        // Find the nearest gradient stop index
         const index = sGradientStops.findIndex((gs) => gs.offset >= valueScale);
-        // const nextIndex = Math.min(index + 1, sGradientStops.length - 1);
-        // work out the colour of this point
         const color = sGradientStops[index].color;
         const vertexColor = parseColorToUIntArgb(color);
-        metaData.push({ country: item.name, pointScale: 1 + valueScale, vertexColor, color });
+        metaData.push({ name: item.name, pointScale: 1 + valueScale, vertexColor, color, prediction: item.prediction, file: item.file, x: item.x, y: item.y, z: item.z});
     }
     return metaData;
 }
