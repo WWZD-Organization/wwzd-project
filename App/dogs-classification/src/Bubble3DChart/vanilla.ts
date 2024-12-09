@@ -1,4 +1,4 @@
-import { drawInitData } from "./dogsChart";
+import { drawInitData } from "./dogsChartData";
 
 /**
  * Creates charts on the provided root elements

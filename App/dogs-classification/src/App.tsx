@@ -1,6 +1,6 @@
 import { MemoryUsageHelper } from 'scichart';
-import ChartComponent from './Bubble3DChart';
-import SideBar from './SideBar';
+import ChartComponent from './Bubble3DChart/chartComponent';
+import SideBar from './SideBar/sideBar';
 import { DataPoint } from './interfaces';
 
 MemoryUsageHelper.isMemoryUsageDebugEnabled = true;

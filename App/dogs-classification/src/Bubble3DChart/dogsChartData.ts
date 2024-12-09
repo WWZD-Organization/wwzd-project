@@ -53,7 +53,6 @@ export const drawInitData = async (rootElement: string | HTMLDivElement) => {
         const valuesWithLabels: string[] = [];
         if (seriesInfo && seriesInfo.isHit) {
             const md = (seriesInfo as XyzSeriesInfo3D).pointMetadata as TMetadata;
-            console.log(md)
             valuesWithLabels.push(md.name);
             valuesWithLabels.push(`X: ${seriesInfo.xValue}`);
             valuesWithLabels.push(`Y: ${seriesInfo.yValue}`);
@@ -61,11 +60,6 @@ export const drawInitData = async (rootElement: string | HTMLDivElement) => {
         }
         return valuesWithLabels;
     };
-
-    // tooltipModifier.modifierMouseEnter = (args) => {
-        // console.log(args);
-    // }
-
 
     const defaultTemplate = tooltipModifier.tooltipSvgTemplate;
     tooltipModifier.tooltipSvgTemplate = (seriesInfo: SeriesInfo3D, svgAnnotation: TooltipSvgAnnotation3D) => {
@@ -77,6 +71,10 @@ export const drawInitData = async (rootElement: string | HTMLDivElement) => {
         return defaultTemplate(seriesInfo, svgAnnotation);
     };
     sciChart3DSurface.chartModifiers.add(tooltipModifier);
+
+    tooltipModifier.modifierMouseEnter = (args) => {
+        console.log("Mouse entered");
+    }
 
     sciChart3DSurface.xAxis = new NumericAxis3D(wasmContext, {
         axisTitle: "X",
