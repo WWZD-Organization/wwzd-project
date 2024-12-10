@@ -26,6 +26,7 @@ def init_data():
 @app.route("/api/v1/data", methods=["POST"])
 def get_output():
     data = request.form
+    print(data)
     name = data.get("name")
     description = data.get("description")
 
@@ -47,9 +48,11 @@ def get_output():
 
     return jsonify(response)
 
+
 @app.route("/api/v1/images/<filename>", methods=["GET"])
 def get_image(filename):
     return send_from_directory('content/images', filename)
+
 
 if __name__ == "__main__":
     app.run(port=3000, debug=True)
