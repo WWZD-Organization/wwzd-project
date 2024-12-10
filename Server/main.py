@@ -26,7 +26,6 @@ def init_data():
 @app.route("/api/v1/data", methods=["POST"])
 def get_output():
     data = request.form
-    print(data)
     name = data.get("name")
     description = data.get("description")
 

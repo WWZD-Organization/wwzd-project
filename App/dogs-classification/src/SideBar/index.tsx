@@ -6,6 +6,8 @@ import classes from './SideBar.module.scss';
 import Modal from 'react-modal';
 import { IPostDog } from '../interfaces/IPostDog';
 
+Modal.setAppElement('#root');
+
 interface Props {
     dataPoint?: IDataPoint;
 }
