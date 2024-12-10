@@ -1,7 +1,7 @@
-import { ApiResponse } from "./interfaces";
+import { IApiResponse } from "./interfaces";
 import Constants from "./utils/Constants";
 
-export async function fetchData(): Promise<ApiResponse> {
+export async function fetchData(): Promise<IApiResponse> {
   try {
     const response = await fetch(`${Constants.BaseApiUrl}/data`, {
       method: "GET",

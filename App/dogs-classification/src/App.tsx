@@ -1,11 +1,11 @@
 import { MemoryUsageHelper } from 'scichart';
 import ChartComponent from './Bubble3DChart';
 import SideBar from './SideBar';
-import { DataPoint } from './interfaces';
+import { IDataPoint } from './interfaces';
 
 MemoryUsageHelper.isMemoryUsageDebugEnabled = true;
 
-const placeholderData: DataPoint = {
+const placeholderData: IDataPoint = {
     "x": 9.028751373291016,
     "y": -11.518657684326172,
     "z": -2.873061180114746,

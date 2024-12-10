@@ -1,4 +1,4 @@
-export interface Prediction {
+export interface IPrediction {
     class: string;
     score: number;
 }

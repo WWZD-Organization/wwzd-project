@@ -1,10 +1,10 @@
 import { getImageUrl } from '../ApiService';
-import { DataPoint } from '../interfaces';
+import { IDataPoint } from '../interfaces';
 import Constants from '../utils/Constants';
 import classes from './SideBar.module.scss';
 
 interface Props {
-    dataPoint?: DataPoint;
+    dataPoint?: IDataPoint;
 }
 
 export default function SideBar({dataPoint}: Props) {

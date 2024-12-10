@@ -1,3 +1,3 @@
-export * from "./DataPoint";
-export * from "./Prediction";
-export * from "./ApiResponse";
+export * from "./IDataPoint";
+export * from "./IPrediction";
+export * from "./IApiResponse";

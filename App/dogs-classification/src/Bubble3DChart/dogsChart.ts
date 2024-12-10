@@ -19,18 +19,19 @@ import {
     TooltipSvgAnnotation3D,
     XyzSeriesInfo3D,
 } from "scichart";
-import { DataPoint } from "../interfaces/DataPoint";
+import { IDataPoint } from "../interfaces/IDataPoint";
 import { fetchData } from "../ApiService";
-import { ApiResponse } from "../interfaces/ApiResponse";
+import { IApiResponse } from "../interfaces/IApiResponse";
+import { IPrediction } from "../interfaces";
 
 type TMetadata = {
-    country: string;
     color: string;
     vertexColor: number;
     pointScale: number;
-};
+} & IDataPoint;
 
 export const drawInitData = async (rootElement: string | HTMLDivElement) => {
+    SciChart3DSurface.UseCommunityLicense();
     const { sciChart3DSurface, wasmContext } = await SciChart3DSurface.create(rootElement, {
         theme: appTheme.SciChartJsTheme,
     });
@@ -50,7 +51,11 @@ export const drawInitData = async (rootElement: string | HTMLDivElement) => {
         const valuesWithLabels: string[] = [];
         if (seriesInfo && seriesInfo.isHit) {
             const md = (seriesInfo as XyzSeriesInfo3D).pointMetadata as TMetadata;
-            valuesWithLabels.push(md.country);
+            const bestPrediction = getBestPrediction(md.prediction);
+            const value = deterministicValue(bestPrediction);
+            valuesWithLabels.push(`Name: ${md.name}`);
+            valuesWithLabels.push(`Prediction: ${bestPrediction}`);
+            valuesWithLabels.push(`Value: ${value}`);
             valuesWithLabels.push(`X: ${seriesInfo.xValue}`);
             valuesWithLabels.push(`Y: ${seriesInfo.yValue}`);
             valuesWithLabels.push(`Z: ${seriesInfo.zValue}`);
@@ -70,33 +75,45 @@ export const drawInitData = async (rootElement: string | HTMLDivElement) => {
 
     sciChart3DSurface.xAxis = new NumericAxis3D(wasmContext, {
         axisTitle: "X",
-        visibleRange: new NumberRange(-50, 50),
+        visibleRange: new NumberRange(-35, 35),
     });
     sciChart3DSurface.yAxis = new NumericAxis3D(wasmContext, {
         axisTitle: "Y",
-        visibleRange: new NumberRange(-50, 50),
+        visibleRange: new NumberRange(-35, 35),
     });
     sciChart3DSurface.zAxis = new NumericAxis3D(wasmContext, {
         axisTitle: "Z",
-        visibleRange: new NumberRange(-50, 50),
+        visibleRange: new NumberRange(-35, 35),
     });
 
-    const response: ApiResponse = await fetchData();
+    const response: IApiResponse = await fetchData();
     const dogsData = response.data;
 
     const x = dogsData.map((item) => item.x);
     const y = dogsData.map((item) => item.y);
     const z = dogsData.map((item) => item.z);
-    // const name = dogsData.map((item) => item.name);
 
     const metadata = formatMetadata(dogsData, [
-        { offset: 1, color: appTheme.VividPink },
-        { offset: 0.9, color: appTheme.VividOrange },
-        { offset: 0.7, color: appTheme.MutedRed },
-        { offset: 0.5, color: appTheme.VividGreen },
-        { offset: 0.3, color: appTheme.VividSkyBlue },
-        { offset: 0.2, color: appTheme.Indigo },
-        { offset: 0, color: appTheme.DarkIndigo },
+        { offset: 0.95, color: appTheme.VividOrange },
+        { offset: 0.9, color: appTheme.VividRed },
+        { offset: 0.85, color: appTheme.MutedRed },
+        { offset: 0.8, color: appTheme.MutedBlue },
+        { offset: 0.75, color: appTheme.VividGreen },
+        { offset: 0.7, color: appTheme.VividTeal },
+        { offset: 0.65, color: appTheme.VividSkyBlue },
+        { offset: 0.6, color: appTheme.Indigo },
+        { offset: 0.55, color: appTheme.DarkIndigo },
+        { offset: 0.5, color: appTheme.VividPink },
+        { offset: 0.45, color: appTheme.MutedTeal },
+        { offset: 0.4, color: appTheme.MutedOrange },
+        { offset: 0.35, color: appTheme.VividPurple },
+        { offset: 0.3, color: appTheme.PalePink },
+        { offset: 0.25, color: appTheme.PaleTeal },
+        { offset: 0.2, color: appTheme.PaleOrange },
+        { offset: 0.15, color: appTheme.PaleBlue },
+        { offset: 0.1, color: appTheme.PalePurple },
+        { offset: 0.05, color: appTheme.MutedPurple },
+        { offset: 0, color: appTheme.VividPurple },
     ]);
 
     sciChart3DSurface.renderableSeries.add(
@@ -115,26 +132,32 @@ export const drawInitData = async (rootElement: string | HTMLDivElement) => {
     return { sciChartSurface: sciChart3DSurface };
 };
 
-function formatMetadata(dogsData: DataPoint[], gradientStops: TGradientStop[]): TMetadata[] {
-    const valuesArray = dogsData.map((item) => item.x);
-    const low = Math.min(...valuesArray);
-    const high = Math.max(...valuesArray);
+function getBestPrediction(prediction: IPrediction[]): string {
+    return prediction.sort((a, b) => (a.class > b.class ? 1 : -1))[0].class;
+}
 
+function deterministicValue(input: string): number {
+    let hash = 0;
+    for (let i = 0; i < input.length; i++) {
+        const char = input.charCodeAt(i);
+        hash = (hash << 7) - hash + char;
+        hash |= 0;
+    }
+    const normalized = (hash >>> 0) / 0xFFFFFFFF;
+    return normalized;
+}
+
+
+function formatMetadata(dogsData: IDataPoint[], gradientStops: TGradientStop[]): TMetadata[] {
     const sGradientStops = gradientStops.sort((a, b) => (a.offset > b.offset ? 1 : -1));
-    // Compute a scaling factor from 0...1 where values in valuesArray at the lower end correspond to 0 and
-    // values at the higher end correspond to 1
     const metaData: TMetadata[] = [];
     for (const item of dogsData) {
-        const x = item.x;
-        // scale from 0..1 for the values
-        const valueScale = (x - low) / (high - low);
-        // Find the nearest gradient stop index
+        const bestPrediction = getBestPrediction(item.prediction);
+        const valueScale = deterministicValue(bestPrediction);
         const index = sGradientStops.findIndex((gs) => gs.offset >= valueScale);
-        // const nextIndex = Math.min(index + 1, sGradientStops.length - 1);
-        // work out the colour of this point
         const color = sGradientStops[index].color;
         const vertexColor = parseColorToUIntArgb(color);
-        metaData.push({ country: item.name, pointScale: 1 + valueScale, vertexColor, color });
+        metaData.push({ pointScale: 1, vertexColor: vertexColor, color: color, ...item });
     }
     return metaData;
 }
