@@ -2,36 +2,17 @@ import { MemoryUsageHelper } from 'scichart';
 import ChartComponent from './Bubble3DChart';
 import SideBar from './SideBar';
 import { IDataPoint } from './interfaces';
+import { useState } from 'react';
 
 MemoryUsageHelper.isMemoryUsageDebugEnabled = true;
 
-const placeholderData: IDataPoint = {
-    "x": 9.028751373291016,
-    "y": -11.518657684326172,
-    "z": -2.873061180114746,
-    "name": "Basenji_2",
-    "file": "Basenji_2.jpg",
-    "prediction": [
-        {
-            "class": "basenji",
-            "score": 55.93
-        },
-        {
-            "class": "toy_terrier",
-            "score": 15.0
-        },
-        {
-            "class": "kelpie",
-            "score": 2.9
-        }
-    ]
-}
-
 function App() {
+    const [selectedDataPoint, setSelectedDataPoint] = useState<IDataPoint>();
+
     return (
         <div className='App'>
-            <ChartComponent />
-            <SideBar dataPoint={placeholderData} />
+                <ChartComponent onDataPointClick={(dataPoint) => setSelectedDataPoint(dataPoint)} />
+                <SideBar dataPoint={selectedDataPoint} />
         </div>
     );
 }

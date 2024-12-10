@@ -30,7 +30,9 @@ type TMetadata = {
     pointScale: number;
 } & IDataPoint;
 
-export const drawInitData = async (rootElement: string | HTMLDivElement) => {
+export const drawInitData = (onDataPointSelected: (dataPoint: IDataPoint) => void) => {
+    
+    return async (rootElement: string | HTMLDivElement) => {
     SciChart3DSurface.UseCommunityLicense();
     const { sciChart3DSurface, wasmContext } = await SciChart3DSurface.create(rootElement, {
         theme: appTheme.SciChartJsTheme,
@@ -40,6 +42,8 @@ export const drawInitData = async (rootElement: string | HTMLDivElement) => {
         target: new Vector3(0, 50, 0),
     });
 
+    let selectedDog: IDataPoint | null = null;
+
     sciChart3DSurface.chartModifiers.add(
         new MouseWheelZoomModifier3D(),
         new OrbitModifier3D(),
@@ -47,7 +51,7 @@ export const drawInitData = async (rootElement: string | HTMLDivElement) => {
     );
 
     const tooltipModifier = new TooltipModifier3D({ tooltipLegendOffsetX: 10, tooltipLegendOffsetY: 10 });
-    tooltipModifier.tooltipDataTemplate = (seriesInfo: SeriesInfo3D, svgAnnotation: TooltipSvgAnnotation3D) => {
+    tooltipModifier.tooltipDataTemplate = (seriesInfo: SeriesInfo3D) => {
         const valuesWithLabels: string[] = [];
         if (seriesInfo && seriesInfo.isHit) {
             const md = (seriesInfo as XyzSeriesInfo3D).pointMetadata as TMetadata;
@@ -59,6 +63,7 @@ export const drawInitData = async (rootElement: string | HTMLDivElement) => {
             valuesWithLabels.push(`X: ${seriesInfo.xValue}`);
             valuesWithLabels.push(`Y: ${seriesInfo.yValue}`);
             valuesWithLabels.push(`Z: ${seriesInfo.zValue}`);
+            selectedDog = md;
         }
         return valuesWithLabels;
     };
@@ -71,6 +76,12 @@ export const drawInitData = async (rootElement: string | HTMLDivElement) => {
         }
         return defaultTemplate(seriesInfo, svgAnnotation);
     };
+    tooltipModifier.modifierMouseDown = () => {
+        if (!selectedDog) {
+            return;
+        }
+        onDataPointSelected(selectedDog);
+    }
     sciChart3DSurface.chartModifiers.add(tooltipModifier);
 
     sciChart3DSurface.xAxis = new NumericAxis3D(wasmContext, {
@@ -160,4 +171,4 @@ function formatMetadata(dogsData: IDataPoint[], gradientStops: TGradientStop[]):
         metaData.push({ pointScale: 1, vertexColor: vertexColor, color: color, ...item });
     }
     return metaData;
-}
+}};
