@@ -1,6 +1,6 @@
 import { IApiResponse } from "./interfaces";
 import { IPostDog } from "./interfaces/IPostDog";
-import Constants from "./utils/Constants";
+import Constants from "./utils/constants";
 
 export async function fetchData(): Promise<IApiResponse> {
   try {
@@ -22,13 +22,14 @@ export async function fetchData(): Promise<IApiResponse> {
 
 export async function sendImageToProcess(dogData: IPostDog) {
    try {
-    console.log(dogData)
+    const form = new FormData();
+    form.append("name", dogData.form.name);
+    form.append("description", dogData.form.description);
+    form.append("image", dogData.form.image);
+
     const response = await fetch(`${Constants.BaseApiUrl}/data`, {
-      body: JSON.stringify(dogData),
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      body: form
     });
 
     if (!response.ok) {

@@ -48,7 +48,9 @@ export default function SideBar({ dataPoint }: Props) {
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        console.log('Form data:', formData);
+        if(!formData.dogPhoto) {
+            return;
+        }
         const dogData: IPostDog = { 
             form: {
                 name: formData.dogName,
