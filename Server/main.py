@@ -1,7 +1,11 @@
 from flask import Flask, jsonify, request, send_from_directory
 import json
-import random
+import os
+import logging
 from flask_cors import CORS
+from utils.feature_extraction import extract_and_predict
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
@@ -22,30 +26,48 @@ def init_data():
         "data": data
     })
 
-
 @app.route("/api/v1/data", methods=["POST"])
 def get_output():
-    data = request.form
-    name = data.get("name")
-    description = data.get("description")
+    try:
+        logging.info("POST data request received")
+        data = request.form
+        name = data.get("name")
+        description = data.get("description")
+        if 'image' not in request.files:
+            return jsonify({"error": "No image part in the request"}), 400
 
-    dog_breeds = ["Labrador", "Poodle", "Bulldog", "Beagle", "Chihuahua"]
-    prediction = random.choice(dog_breeds)
+        file = request.files['image']
 
-    x = random.uniform(0, 100)
-    y = random.uniform(0, 100)
-    z = random.uniform(0, 100)
+        if file.filename == '':
+            return jsonify({"error": "No file selected"}), 400
 
-    response = {
-        "name": name,
-        "description": description,
-        "prediction": prediction,
-        "x": x,
-        "y": y,
-        "z": z
-    }
+        file_path = os.path.join('content/images', file.filename)
+        file.save(file_path)
 
-    return jsonify(response)
+        dimensions, prediction = extract_and_predict(file_path)
+
+        response = {
+            "name": name,
+            "description": description,
+            "prediction": prediction,
+            "file": file.filename,
+            "x": str(dimensions[0]),
+            "y": str(dimensions[1]),
+            "z": str(dimensions[2])
+        }
+
+        logging.info("Result of feature extractions: ", response)
+
+        with open("./content/images.json", 'r') as file:
+            data = json.load(file)
+            data.append(response)
+        with open("./content/images.json", 'w') as file:
+            json.dump(data, file, indent=4)
+
+        return jsonify(response)
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/v1/images/<filename>", methods=["GET"])
