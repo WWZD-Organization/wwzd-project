@@ -5,8 +5,9 @@ import { IDataPoint } from "../interfaces";
 
 interface Props {
     onDataPointClick: (dataPoint: IDataPoint) => void;
+    dataPoints: IDataPoint[]
 }
 
-export default function ChartComponent({ onDataPointClick }: Props) {
-    return <SciChartReact initChart={drawInitData(onDataPointClick)} className={classes.ChartWrapper} />;
+export default function ChartComponent({ onDataPointClick, dataPoints }: Props) {
+    return <SciChartReact initChart={drawInitData(onDataPointClick, dataPoints)} className={classes.ChartWrapper} />;
 }

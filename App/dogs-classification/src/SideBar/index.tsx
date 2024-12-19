@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { getImageUrl, sendImageToProcess } from '../ApiService';
 import { IDataPoint } from '../interfaces';
-import Constants from '../utils/Constants';
+import Constants from '../utils/constants';
 import classes from './SideBar.module.scss';
 import Modal from 'react-modal';
 import { IPostDog } from '../interfaces/IPostDog';
@@ -10,9 +10,10 @@ Modal.setAppElement('#root');
 
 interface Props {
     dataPoint?: IDataPoint;
+    addDataPoint: (dataPoint: IDataPoint) => void;
 }
 
-export default function SideBar({ dataPoint }: Props) {
+export default function SideBar({ dataPoint, addDataPoint }: Props) {
     const imageUrl = dataPoint?.file
         ? getImageUrl(dataPoint.file)
         : Constants.NoDataSelectedUrl;
@@ -46,7 +47,7 @@ export default function SideBar({ dataPoint }: Props) {
         }
     }
 
-    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         if(!formData.dogPhoto) {
             return;
@@ -58,7 +59,8 @@ export default function SideBar({ dataPoint }: Props) {
                 image: formData.dogPhoto
             }
         };
-        sendImageToProcess(dogData);
+        const response = await sendImageToProcess(dogData);
+        addDataPoint(response)
         closeModal();
     }
 

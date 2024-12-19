@@ -20,8 +20,6 @@ import {
     XyzSeriesInfo3D,
 } from "scichart";
 import { IDataPoint } from "../interfaces/IDataPoint";
-import { fetchData } from "../ApiService";
-import { IApiResponse } from "../interfaces/IApiResponse";
 import { IPrediction } from "../interfaces";
 
 type TMetadata = {
@@ -30,7 +28,7 @@ type TMetadata = {
     pointScale: number;
 } & IDataPoint;
 
-export const drawInitData = (onDataPointSelected: (dataPoint: IDataPoint) => void) => {
+export const drawInitData = (onDataPointSelected: (dataPoint: IDataPoint) => void, dataPoints: IDataPoint[]) => {
     
     return async (rootElement: string | HTMLDivElement) => {
     SciChart3DSurface.UseCommunityLicense();
@@ -97,14 +95,11 @@ export const drawInitData = (onDataPointSelected: (dataPoint: IDataPoint) => voi
         visibleRange: new NumberRange(-35, 35),
     });
 
-    const response: IApiResponse = await fetchData();
-    const dogsData = response.data;
+    const x = dataPoints.map((item) => item.x);
+    const y = dataPoints.map((item) => item.y);
+    const z = dataPoints.map((item) => item.z);
 
-    const x = dogsData.map((item) => item.x);
-    const y = dogsData.map((item) => item.y);
-    const z = dogsData.map((item) => item.z);
-
-    const metadata = formatMetadata(dogsData, [
+    const metadata = formatMetadata(dataPoints, [
         { offset: 0.95, color: appTheme.VividOrange },
         { offset: 0.9, color: appTheme.VividRed },
         { offset: 0.85, color: appTheme.MutedRed },
@@ -144,7 +139,7 @@ export const drawInitData = (onDataPointSelected: (dataPoint: IDataPoint) => voi
 };
 
 function getBestPrediction(prediction: IPrediction[]): string {
-    return prediction.sort((a, b) => (a.class > b.class ? 1 : -1))[0].class;
+    return prediction.sort((a, b) => (a.score > b.score ? 1 : -1))[0].class;
 }
 
 function deterministicValue(input: string): number {
