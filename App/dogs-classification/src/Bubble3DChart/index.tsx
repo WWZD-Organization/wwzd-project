@@ -9,5 +9,5 @@ interface Props {
 }
 
 export default function ChartComponent({ onDataPointClick, dataPoints }: Props) {
-    return <SciChartReact initChart={drawInitData(onDataPointClick, dataPoints)} className={classes.ChartWrapper} />;
+    return <SciChartReact key={dataPoints.length} initChart={drawInitData(onDataPointClick, dataPoints)} className={classes.ChartWrapper} />;
 }
