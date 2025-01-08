@@ -49,10 +49,8 @@ export class SciChart2022AppTheme implements AppThemeBase {
     VividPurple = "#882B91";
     VividGreen = "#67BDAF";
     VividRed = "#C52E60";
-
     DarkIndigo = "#14233C";
     Indigo = "#264B93";
-
     MutedSkyBlue = "#83D2F5";
     MutedPink = "#DF69A8";
     MutedTeal = "#7BCAAB";
@@ -60,13 +58,29 @@ export class SciChart2022AppTheme implements AppThemeBase {
     MutedBlue = "#537ABD";
     MutedPurple = "#A16DAE";
     MutedRed = "#DC7969";
-
     PaleSkyBlue = "#E4F5FC";
     PalePink = "#EEB3D2";
     PaleTeal = "#B9E0D4";
     PaleOrange = "#F1CFB5";
     PaleBlue = "#B5BEDF";
     PalePurple = "#CFB4D5";
+    LightGray = "#D3D3D3";
+    DarkGray = "#A9A9A9";
+    LightGreen = "#90EE90";
+    DarkGreen = "#006400";
+    LightYellow = "#FFFFE0";
+    DarkYellow = "#FFD700";
+    LightCyan = "#E0FFFF";
+    DarkCyan = "#008B8B";
+    LightCoral = "#F08080";
+    DarkCoral = "#CD5B45";
+    LightSalmon = "#FFA07A";
+    DarkSalmon = "#E9967A";
+    LightSlateGray = "#778899";
+    LightMagenta = "#FF77FF";
+    DarkMagenta = "#8B008B";
+    LightGold = "#FFD700";
+    DarkGold = "#B8860B";
 }
 
 export const appTheme = new SciChart2022AppTheme();
