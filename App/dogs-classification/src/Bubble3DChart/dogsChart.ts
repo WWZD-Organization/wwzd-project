@@ -84,15 +84,15 @@ export const drawInitData = (onDataPointSelected: (dataPoint: IDataPoint) => voi
 
     sciChart3DSurface.xAxis = new NumericAxis3D(wasmContext, {
         axisTitle: "X",
-        visibleRange: new NumberRange(-35, 35),
+        visibleRange: new NumberRange(-25, 25),
     });
     sciChart3DSurface.yAxis = new NumericAxis3D(wasmContext, {
         axisTitle: "Y",
-        visibleRange: new NumberRange(-35, 35),
+        visibleRange: new NumberRange(-25, 25),
     });
     sciChart3DSurface.zAxis = new NumericAxis3D(wasmContext, {
         axisTitle: "Z",
-        visibleRange: new NumberRange(-35, 35),
+        visibleRange: new NumberRange(-25, 25),
     });
 
     const x = dataPoints.map((item) => item.x);
@@ -139,7 +139,7 @@ export const drawInitData = (onDataPointSelected: (dataPoint: IDataPoint) => voi
 };
 
 function getBestPrediction(prediction: IPrediction[]): string {
-    return prediction.sort((a, b) => (a.score > b.score ? 1 : -1))[0].class;
+    return prediction.sort((a, b) => (a.score > b.score ? -1 : 1))[0].class;
 }
 
 function deterministicValue(input: string): number {
@@ -160,7 +160,8 @@ function formatMetadata(dogsData: IDataPoint[], gradientStops: TGradientStop[]):
     for (const item of dogsData) {
         const bestPrediction = getBestPrediction(item.prediction);
         const valueScale = deterministicValue(bestPrediction);
-        const index = sGradientStops.findIndex((gs) => gs.offset >= valueScale);
+        let index = sGradientStops.findIndex((gs) => gs.offset >= valueScale);
+        index = index === -1 ? sGradientStops.length - 1 : index;
         const color = sGradientStops[index].color;
         const vertexColor = parseColorToUIntArgb(color);
         metaData.push({ pointScale: 1, vertexColor: vertexColor, color: color, ...item });
