@@ -10,15 +10,21 @@ MemoryUsageHelper.isMemoryUsageDebugEnabled = true;
 function App() {
     const [selectedDataPoint, setSelectedDataPoint] = useState<IDataPoint>();
     const [dataPoints, setDataPoints] = useState<IDataPoint[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<string>('tsne');  // Stan na kategorię
 
     useEffect(() => {
-        init()
+        init(selectedCategory)
     }, []);
 
-    const init = async () => {
-        const response = await fetchData();
+    const init = async (category: string) => {
+        const response = await fetchData(category);
         setDataPoints(response.data);
     }
+
+    const sendCategoryToApp = (category: string) => {
+        setSelectedCategory(category);  
+        init(category); 
+    };
 
     return (
         <div className='App'>
@@ -29,6 +35,7 @@ function App() {
             <SideBar 
                 dataPoint={selectedDataPoint} 
                 addDataPoint={(dataPoint) => setDataPoints([...dataPoints, dataPoint])}
+                sendCategoryToApp={sendCategoryToApp}
             />
         </div>
     );

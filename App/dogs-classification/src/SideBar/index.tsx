@@ -11,15 +11,17 @@ Modal.setAppElement('#root');
 interface Props {
     dataPoint?: IDataPoint;
     addDataPoint: (dataPoint: IDataPoint) => void;
+    sendCategoryToApp: (category: string) => void;
 }
 
-export default function SideBar({ dataPoint, addDataPoint }: Props) {
+export default function SideBar({ dataPoint, addDataPoint, sendCategoryToApp}: Props) {
     const imageUrl = dataPoint?.file
         ? getImageUrl(dataPoint.file)
         : Constants.NoDataSelectedUrl;
 
     let subtitle: any;
     const [modalIsOpen, setIsOpen] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState('tsne'); // Nowy stan dla radio buttonów
     const [formData, setFormData] = useState({
         dogName: '',
         description: '',
@@ -41,29 +43,33 @@ export default function SideBar({ dataPoint, addDataPoint }: Props) {
     function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
         const { name, value, files } = event.target;
         if (name === 'dogPhoto' && files) {
-            setFormData({ ...formData, dogPhoto: files[0],  });
+            setFormData({ ...formData, dogPhoto: files[0] });
         } else {
             setFormData({ ...formData, [name]: value });
         }
     }
 
+    function handleCategoryChange(event: React.ChangeEvent<HTMLInputElement>) {
+        setSelectedCategory(event.target.value);
+    }
+
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        if(!formData.dogPhoto) {
+        if (!formData.dogPhoto) {
             return;
         }
-        const dogData: IPostDog = { 
+        const dogData: IPostDog = {
             form: {
                 name: formData.dogName,
                 description: formData.description,
-                image: formData.dogPhoto
-            }
+                image: formData.dogPhoto,
+                category: selectedCategory, 
+            },
         };
         const response = await sendImageToProcess(dogData);
-        addDataPoint(response)
+        addDataPoint(response);
         closeModal();
     }
-
 
     return (
         <div className={classes.Wrapper}>
@@ -88,9 +94,43 @@ export default function SideBar({ dataPoint, addDataPoint }: Props) {
                         </ul>
                     </div>
                 </div>
-                <button className={classes.UploadButton} onClick={openModal}>
-                    Upload
-                </button>
+                <div>
+                    <button className={classes.UploadButton} onClick={openModal}>
+                        Upload image
+                    </button>
+                    <div className={classes.radioContainer}>
+                        <legend>Category</legend>
+                        <label>
+                            <div className={classes.radioItem}>
+                                <div>tsne</div>
+                                <input
+                                    type="radio"
+                                    name="category"
+                                    value="tsne"
+                                    checked={selectedCategory === 'tsne'}
+                                    onChange={handleCategoryChange}
+                                />
+                            </div>
+                        </label>
+                        <label>
+                            <div className={classes.radioItem}>
+                                <div>pca</div>
+                                <input
+                                    type="radio"
+                                    name="category"
+                                    value="pca"
+                                    checked={selectedCategory === 'pca'}
+                                    onChange={handleCategoryChange}
+                                />
+                            </div>
+                        </label>
+                        <button 
+                            className={classes.SendCategoryButton} 
+                            onClick={() => sendCategoryToApp(selectedCategory)}>
+                            Change method
+                        </button>
+                    </div>
+                </div>
                 <Modal
                     isOpen={modalIsOpen}
                     onAfterOpen={afterOpenModal}
@@ -98,7 +138,6 @@ export default function SideBar({ dataPoint, addDataPoint }: Props) {
                     style={customModalStyles}
                     contentLabel="Example Modal"
                 >
-                    <h2 ref={(_subtitle) => (subtitle = _subtitle)}>Hello</h2>
                     <form className={classes.ModalContainer} onSubmit={handleSubmit}>
                         <label>
                             Dog Name
@@ -124,10 +163,12 @@ export default function SideBar({ dataPoint, addDataPoint }: Props) {
                                 onChange={handleInputChange}
                             />
                         </label>
-                        <button type="submit">Send</button>
-                        <button type="button" onClick={closeModal}>
-                            X
-                        </button>
+                        <div className={classes.ModalButtons}>
+                            <button type="submit">Send</button>
+                            <button type="button" onClick={closeModal}>
+                                X
+                            </button>
+                        </div>
                     </form>
                 </Modal>
             </div>

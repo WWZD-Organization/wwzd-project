@@ -2,6 +2,7 @@ export interface IPostDog {
     form : {
         name: string;
         description: string;
-        image: File 
+        image: File;
+        category: string;
     }
 }
