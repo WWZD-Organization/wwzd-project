@@ -16,10 +16,11 @@ base_model = EfficientNetB0(weights='imagenet')
 
 features_output = base_model.get_layer('avg_pool').output
 # Model without final classification layers - we will use it only for feature extraction
-model = tf.keras.Model(inputs=base_model.input, outputs=features_output)
+model = tf.keras.Model(inputs=base_model.input, outputs=[features_output])
 scaler = StandardScaler()
 pca = PCA(n_components=3)
 tsne = TSNE(n_components=3, random_state=42) # t-SNE is computationally expensive and non-deterministic (results can vary unless random_state is set).
+all_features = np.empty((0, 1280))  # Empty array to store all features
 
 image_size = (224, 224)  # Size for EfficientNetB0
 images_folder = "content/images"
@@ -34,13 +35,16 @@ def preprocess_image(img_path):
 
 def extract_features(preprocessed_image):
     features = model.predict(preprocessed_image)
-    logging.info(features.shape)
     logging.info("Extracted features shape: ", features.shape)
     # Scaling features to mean 0 and variance 1 (standard deviation of 1)
     features_scaled = scaler.transform(features)
 
+    all_features = np.vstack([all_features, features_scaled])
     features_3d_pca = pca.transform(features_scaled)
-    features_3d_tsne = tsne.fit_transform(features_scaled)
+
+    all_features_3d_tsne = tsne.fit_transform(all_features)    
+    features_3d_tsne = all_features_3d_tsne[-1]
+
     return features_3d_pca[0], features_3d_tsne[0]
 
 def predict_image(preprocessed_image):
@@ -69,21 +73,21 @@ def fit_all():
     logging.info("Extracted features shape: %s", str(features.shape))
 
     features_scaled = scaler.fit_transform(features)
+    all_features = features_scaled
     pca.fit_transform(features_scaled)
-    tsne.fit_transform(features_scaled)
 
 def init(): 
-    if not os.path.exists('scaler.pkl') or not os.path.exists('pca.pkl') or not os.path.exists('tsne.pkl'):
-        logging.info("No pre-fitted scaler or PCA found. Fitting new models...")
-        try:
-            fit_all()
-            joblib.dump(scaler, 'scaler.pkl')
-            joblib.dump(pca, 'pca.pkl')
-            joblib.dump(tsne, 'tsne.pkl')
-        except Exception as e:
-            logging.error(f"An error occurred: {e}")
-    else:
-        logging.info("Loading pre-fitted scaler and PCA...")
-        scaler = joblib.load('scaler.pkl')
-        pca = joblib.load('pca.pkl')
-        tsne = joblib.load('tsne.pkl')
+    logging.info("Initializing feature extraction...")
+
+if not os.path.exists('scaler.pkl') or not os.path.exists('pca.pkl') or not os.path.exists('tsne.pkl'):
+    logging.info("No pre-fitted scaler or PCA. Fitting new models...")
+    try:
+        fit_all()
+        joblib.dump(scaler, 'scaler.pkl')
+        joblib.dump(pca, 'pca.pkl')
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+else:
+    logging.info("Loading pre-fitted scaler and PCA...")
+    scaler = joblib.load('scaler.pkl')
+    pca = joblib.load('pca.pkl')
