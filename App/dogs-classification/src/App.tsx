@@ -10,30 +10,31 @@ MemoryUsageHelper.isMemoryUsageDebugEnabled = true;
 function App() {
     const [selectedDataPoint, setSelectedDataPoint] = useState<IDataPoint>();
     const [dataPoints, setDataPoints] = useState<IDataPoint[]>([]);
-    const [selectedMethod, setSelectedMethod] = useState<string>('tsne');  // Stan na kategorię
+    const [selectedMethod, setSelectedMethod] = useState<string>('tsne'); 
 
     useEffect(() => {
-        init(selectedMethod)
+        init(selectedMethod);
     }, []);
 
     const init = async (method: string) => {
-        const response = await fetchData(method);
-        setDataPoints(response.data);
-    }
+        const dataPoints = await fetchData(method);
+        setDataPoints(dataPoints.data);
+    };
 
     const sendMethodToApp = (method: string) => {
-        setSelectedMethod(method);  
-        init(method); 
+        setSelectedMethod(method);
+        init(method);
     };
 
     return (
         <div className='App'>
-            <ChartComponent 
-                onDataPointClick={(dataPoint) => setSelectedDataPoint(dataPoint)} 
+            <ChartComponent
+                key={dataPoints.map(dp => `${dp.x},${dp.y},${dp.z}`).join('|')} 
+                onDataPointClick={(dataPoint) => setSelectedDataPoint(dataPoint)}
                 dataPoints={dataPoints}
             />
-            <SideBar 
-                dataPoint={selectedDataPoint} 
+            <SideBar
+                dataPoint={selectedDataPoint}
                 addDataPoint={(dataPoint) => setDataPoints([...dataPoints, dataPoint])}
                 sendMethodToApp={sendMethodToApp}
             />

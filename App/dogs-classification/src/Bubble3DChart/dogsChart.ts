@@ -29,6 +29,7 @@ type TMetadata = {
 } & IDataPoint;
 
 export const drawInitData = (onDataPointSelected: (dataPoint: IDataPoint) => void, dataPoints: IDataPoint[]) => {
+    console.log(dataPoints)
     return async (rootElement: string | HTMLDivElement) => {
     SciChart3DSurface.UseCommunityLicense();
     const { sciChart3DSurface, wasmContext } = await SciChart3DSurface.create(rootElement, {
