@@ -5,7 +5,6 @@ from tensorflow.keras.applications.efficientnet import preprocess_input, decode_
 import numpy as np
 import os
 import logging
-import joblib
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
@@ -34,18 +33,23 @@ def preprocess_image(img_path):
 
 
 def extract_features(preprocessed_image):
+    global all_features
+    global scaler
+    global pca
+    global tsne
+
     features = model.predict(preprocessed_image)
     logging.info("Extracted features shape: ", features.shape)
     # Scaling features to mean 0 and variance 1 (standard deviation of 1)
     features_scaled = scaler.transform(features)
 
-    all_features = np.vstack([all_features, features_scaled])
+    print(all_features.shape)
+
+    all_features = np.vstack([features_scaled, all_features])
     features_3d_pca = pca.transform(features_scaled)
-
     all_features_3d_tsne = tsne.fit_transform(all_features)    
-    features_3d_tsne = all_features_3d_tsne[-1]
 
-    return features_3d_pca[0], features_3d_tsne[0]
+    return features_3d_pca[0], all_features_3d_tsne[0]
 
 def predict_image(preprocessed_image):
     preds = base_model.predict(preprocessed_image)
@@ -61,12 +65,26 @@ def extract_and_predict(img_path):
     return dimensions_pca, dimensions_tsne, predictions
 
 def fit_all():
-    features = []
-    for filename in os.listdir(images_folder):
-        if filename.endswith(".jpg") or filename.endswith(".png"):
-            img_path = os.path.join(images_folder, filename)
-            img_array = preprocess_image(img_path)
-            features.append(model.predict(img_array))  # Extract features using EfficientNet
+    global all_features
+    global scaler
+    global pca
+
+    if os.path.exists("features.npy"):
+        features = np.load("features.npy")
+        logging.info("Loaded features from file.")
+    else:
+        features = []
+        for filename in os.listdir(images_folder):
+            if filename.endswith(".jpg") or filename.endswith(".png"):
+                img_path = os.path.join(images_folder, filename)
+                img_array = preprocess_image(img_path)
+                features.append(model.predict(img_array))  # Extract features using EfficientNet
+        features = np.array(features).squeeze()
+        np.save("features.npy", features)
+        logging.info("Extracted and saved features.")
+
+        # Save features to a fil
+        np.save("features.npy", features)
 
     # Convert the list of features to a NumPy array
     features = np.array(features).squeeze()
@@ -79,15 +97,7 @@ def fit_all():
 def init(): 
     logging.info("Initializing feature extraction...")
 
-if not os.path.exists('scaler.pkl') or not os.path.exists('pca.pkl') or not os.path.exists('tsne.pkl'):
-    logging.info("No pre-fitted scaler or PCA. Fitting new models...")
-    try:
-        fit_all()
-        joblib.dump(scaler, 'scaler.pkl')
-        joblib.dump(pca, 'pca.pkl')
-    except Exception as e:
-        logging.error(f"An error occurred: {e}")
-else:
-    logging.info("Loading pre-fitted scaler and PCA...")
-    scaler = joblib.load('scaler.pkl')
-    pca = joblib.load('pca.pkl')
+try:
+    fit_all()
+except Exception as e:
+    logging.error(f"An error occurred: {e}")
