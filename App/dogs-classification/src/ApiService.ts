@@ -2,9 +2,9 @@ import { IApiResponse } from "./interfaces";
 import { IPostDog } from "./interfaces/IPostDog";
 import Constants from "./utils/constants";
 
-export async function fetchData(category: string): Promise<IApiResponse> {
+export async function fetchData(method: string): Promise<IApiResponse> {
   try {
-    const response = await fetch(`${Constants.BaseApiUrl}/data?method=${category}`, {
+    const response = await fetch(`${Constants.BaseApiUrl}/data?method=${method}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -28,7 +28,7 @@ export async function sendImageToProcess(dogData: IPostDog) {
     form.append("description", dogData.form.description);
     form.append("image", dogData.form.image);
 
-    const response = await fetch(`${Constants.BaseApiUrl}/data?method=${dogData.form.category}`, {
+    const response = await fetch(`${Constants.BaseApiUrl}/data?method=${dogData.form.method}`, {
       method: "POST",
       body: form
     });

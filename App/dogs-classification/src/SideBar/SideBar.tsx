@@ -11,17 +11,17 @@ Modal.setAppElement('#root');
 interface Props {
     dataPoint?: IDataPoint;
     addDataPoint: (dataPoint: IDataPoint) => void;
-    sendCategoryToApp: (category: string) => void;
+    sendMethodToApp: (method: string) => void;
 }
 
-export default function SideBar({ dataPoint, addDataPoint, sendCategoryToApp}: Props) {
+export default function SideBar({ dataPoint, addDataPoint, sendMethodToApp}: Props) {
     const imageUrl = dataPoint?.file
         ? getImageUrl(dataPoint.file)
         : Constants.NoDataSelectedUrl;
 
     let subtitle: any;
     const [modalIsOpen, setIsOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState('tsne'); // Nowy stan dla radio buttonów
+    const [selectedMethod, setSelectedMethod] = useState('tsne'); 
     const [formData, setFormData] = useState({
         dogName: '',
         description: '',
@@ -49,8 +49,8 @@ export default function SideBar({ dataPoint, addDataPoint, sendCategoryToApp}: P
         }
     }
 
-    function handleCategoryChange(event: React.ChangeEvent<HTMLInputElement>) {
-        setSelectedCategory(event.target.value);
+    function handleMethodChange(event: React.ChangeEvent<HTMLInputElement>) {
+        setSelectedMethod(event.target.value);
     }
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -63,7 +63,7 @@ export default function SideBar({ dataPoint, addDataPoint, sendCategoryToApp}: P
                 name: formData.dogName,
                 description: formData.description,
                 image: formData.dogPhoto,
-                category: selectedCategory, 
+                method: selectedMethod, 
             },
         };
         const response = await sendImageToProcess(dogData);
@@ -99,16 +99,16 @@ export default function SideBar({ dataPoint, addDataPoint, sendCategoryToApp}: P
                         Upload image
                     </button>
                     <div className={classes.radioContainer}>
-                        <legend>Category</legend>
+                        <legend>Method</legend>
                         <label>
                             <div className={classes.radioItem}>
                                 <div>tsne</div>
                                 <input
                                     type="radio"
-                                    name="category"
+                                    name="method"
                                     value="tsne"
-                                    checked={selectedCategory === 'tsne'}
-                                    onChange={handleCategoryChange}
+                                    checked={selectedMethod === 'tsne'}
+                                    onChange={handleMethodChange}
                                 />
                             </div>
                         </label>
@@ -117,16 +117,16 @@ export default function SideBar({ dataPoint, addDataPoint, sendCategoryToApp}: P
                                 <div>pca</div>
                                 <input
                                     type="radio"
-                                    name="category"
+                                    name="method"
                                     value="pca"
-                                    checked={selectedCategory === 'pca'}
-                                    onChange={handleCategoryChange}
+                                    checked={selectedMethod === 'pca'}
+                                    onChange={handleMethodChange}
                                 />
                             </div>
                         </label>
                         <button 
-                            className={classes.SendCategoryButton} 
-                            onClick={() => sendCategoryToApp(selectedCategory)}>
+                            className={classes.SendMethodButton} 
+                            onClick={() => sendMethodToApp(selectedMethod)}>
                             Change method
                         </button>
                     </div>

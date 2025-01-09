@@ -3,6 +3,6 @@ export interface IPostDog {
         name: string;
         description: string;
         image: File;
-        category: string;
+        method: string;
     }
 }

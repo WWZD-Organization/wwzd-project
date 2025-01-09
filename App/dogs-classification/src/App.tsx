@@ -1,6 +1,6 @@
 import { MemoryUsageHelper } from 'scichart';
 import ChartComponent from './Bubble3DChart';
-import SideBar from './SideBar';
+import SideBar from './SideBar/SideBar.tsx';
 import { IDataPoint } from './interfaces';
 import { useEffect, useState } from 'react';
 import { fetchData } from './ApiService';
@@ -10,20 +10,20 @@ MemoryUsageHelper.isMemoryUsageDebugEnabled = true;
 function App() {
     const [selectedDataPoint, setSelectedDataPoint] = useState<IDataPoint>();
     const [dataPoints, setDataPoints] = useState<IDataPoint[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState<string>('tsne');  // Stan na kategorię
+    const [selectedMethod, setSelectedMethod] = useState<string>('tsne');  // Stan na kategorię
 
     useEffect(() => {
-        init(selectedCategory)
+        init(selectedMethod)
     }, []);
 
-    const init = async (category: string) => {
-        const response = await fetchData(category);
+    const init = async (method: string) => {
+        const response = await fetchData(method);
         setDataPoints(response.data);
     }
 
-    const sendCategoryToApp = (category: string) => {
-        setSelectedCategory(category);  
-        init(category); 
+    const sendMethodToApp = (method: string) => {
+        setSelectedMethod(method);  
+        init(method); 
     };
 
     return (
@@ -35,7 +35,7 @@ function App() {
             <SideBar 
                 dataPoint={selectedDataPoint} 
                 addDataPoint={(dataPoint) => setDataPoints([...dataPoints, dataPoint])}
-                sendCategoryToApp={sendCategoryToApp}
+                sendMethodToApp={sendMethodToApp}
             />
         </div>
     );
