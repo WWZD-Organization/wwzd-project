@@ -14,19 +14,20 @@ interface Props {
     sendMethodToApp: (method: string) => void;
 }
 
-export default function SideBar({ dataPoint, addDataPoint, sendMethodToApp}: Props) {
+export default function SideBar({ dataPoint, addDataPoint, sendMethodToApp }: Props) {
     const imageUrl = dataPoint?.file
         ? getImageUrl(dataPoint.file)
         : Constants.NoDataSelectedUrl;
 
     let subtitle: any;
     const [modalIsOpen, setIsOpen] = useState(false);
-    const [selectedMethod, setSelectedMethod] = useState('tsne'); 
+    const [selectedMethod, setSelectedMethod] = useState('tsne');
     const [formData, setFormData] = useState({
         dogName: '',
         description: '',
         dogPhoto: null as File | null,
     });
+    const [isLoading, setIsLoading] = useState(false); // Loading state
 
     function openModal() {
         setIsOpen(true);
@@ -58,17 +59,26 @@ export default function SideBar({ dataPoint, addDataPoint, sendMethodToApp}: Pro
         if (!formData.dogPhoto) {
             return;
         }
-        const dogData: IPostDog = {
-            form: {
-                name: formData.dogName,
-                description: formData.description,
-                image: formData.dogPhoto,
-                method: selectedMethod, 
-            },
-        };
-        const response = await sendImageToProcess(dogData);
-        addDataPoint(response);
-        closeModal();
+
+        setIsLoading(true); // Start loading
+
+        try {
+            const dogData: IPostDog = {
+                form: {
+                    name: formData.dogName,
+                    description: formData.description,
+                    image: formData.dogPhoto,
+                    method: selectedMethod,
+                },
+            };
+            const response = await sendImageToProcess(dogData);
+            addDataPoint(response);
+            closeModal();
+        } catch (error) {
+            console.error('Error processing image:', error);
+        } finally {
+            setIsLoading(false); // End loading
+        }
     }
 
     return (
@@ -95,8 +105,12 @@ export default function SideBar({ dataPoint, addDataPoint, sendMethodToApp}: Pro
                     </div>
                 </div>
                 <div>
-                    <button className={classes.UploadButton} onClick={openModal}>
-                        Upload image
+                    <button 
+                        className={classes.UploadButton} 
+                        onClick={openModal} 
+                        disabled={isLoading} // Disable button when loading
+                    >
+                        {isLoading ? 'Processing...' : 'Upload image'}
                     </button>
                     <div className={classes.radioContainer}>
                         <legend>Method</legend>
@@ -126,7 +140,8 @@ export default function SideBar({ dataPoint, addDataPoint, sendMethodToApp}: Pro
                         </label>
                         <button 
                             className={classes.SendMethodButton} 
-                            onClick={() => sendMethodToApp(selectedMethod)}>
+                            onClick={() => sendMethodToApp(selectedMethod)}
+                        >
                             Change method
                         </button>
                     </div>
@@ -164,8 +179,10 @@ export default function SideBar({ dataPoint, addDataPoint, sendMethodToApp}: Pro
                             />
                         </label>
                         <div className={classes.ModalButtons}>
-                            <button type="submit">Send</button>
-                            <button type="button" onClick={closeModal}>
+                            <button type="submit" disabled={isLoading}> {/* Disable submit when loading */}
+                                {isLoading ? 'Sending...' : 'Send'}
+                            </button>
+                            <button type="button" onClick={closeModal} disabled={isLoading}>
                                 X
                             </button>
                         </div>
