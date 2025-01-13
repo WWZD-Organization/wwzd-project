@@ -82,7 +82,7 @@ export const drawInitData = (onDataPointSelected: (dataPoint: IDataPoint) => voi
     }
     sciChart3DSurface.chartModifiers.add(tooltipModifier);
 
-    const axisLength = methodType === 'tsne' ? 100 : 25;
+    const axisLength = methodType === 'tsne' ? 125 : 20;
 
     sciChart3DSurface.xAxis = new NumericAxis3D(wasmContext, {
         axisTitle: "X",
