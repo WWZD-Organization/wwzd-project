@@ -1,5 +1,5 @@
 import { MemoryUsageHelper } from 'scichart';
-import ChartComponent from './Bubble3DChart';
+import ChartComponent from './Bubble3DChart/chartIndex.tsx';
 import SideBar from './SideBar/SideBar.tsx';
 import { IDataPoint } from './interfaces';
 import { useEffect, useState } from 'react';
@@ -32,6 +32,7 @@ function App() {
                 key={dataPoints.map(dp => `${dp.x},${dp.y},${dp.z}`).join('|')} 
                 onDataPointClick={(dataPoint) => setSelectedDataPoint(dataPoint)}
                 dataPoints={dataPoints}
+                methodType={selectedMethod}
             />
             <SideBar
                 dataPoint={selectedDataPoint}

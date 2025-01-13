@@ -28,7 +28,7 @@ type TMetadata = {
     pointScale: number;
 } & IDataPoint;
 
-export const drawInitData = (onDataPointSelected: (dataPoint: IDataPoint) => void, dataPoints: IDataPoint[]) => {
+export const drawInitData = (onDataPointSelected: (dataPoint: IDataPoint) => void, dataPoints: IDataPoint[], methodType: string) => {
     console.log(dataPoints)
     return async (rootElement: string | HTMLDivElement) => {
     SciChart3DSurface.UseCommunityLicense();
@@ -82,17 +82,19 @@ export const drawInitData = (onDataPointSelected: (dataPoint: IDataPoint) => voi
     }
     sciChart3DSurface.chartModifiers.add(tooltipModifier);
 
+    const axisLength = methodType === 'tsne' ? 100 : 25;
+
     sciChart3DSurface.xAxis = new NumericAxis3D(wasmContext, {
         axisTitle: "X",
-        visibleRange: new NumberRange(-25, 25),
+        visibleRange: new NumberRange(-1 * axisLength, axisLength),
     });
     sciChart3DSurface.yAxis = new NumericAxis3D(wasmContext, {
         axisTitle: "Y",
-        visibleRange: new NumberRange(-25, 25),
+        visibleRange: new NumberRange(-1 * axisLength, axisLength),
     });
     sciChart3DSurface.zAxis = new NumericAxis3D(wasmContext, {
         axisTitle: "Z",
-        visibleRange: new NumberRange(-25, 25),
+        visibleRange: new NumberRange(-1 * axisLength, axisLength),
     });
 
     const x = dataPoints.map((item) => item.x);
