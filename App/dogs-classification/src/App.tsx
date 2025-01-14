@@ -26,6 +26,11 @@ function App() {
         init(method);
     };
 
+    const addDataPoint = (dataPoint: IDataPoint) => {
+        setDataPoints([...dataPoints, dataPoint]);
+        setSelectedDataPoint(dataPoint);
+    }
+
     return (
         <div className='App'>
             <ChartComponent
@@ -36,7 +41,7 @@ function App() {
             />
             <SideBar
                 dataPoint={selectedDataPoint}
-                addDataPoint={(dataPoint) => setDataPoints([...dataPoints, dataPoint])}
+                addDataPoint={addDataPoint}
                 sendMethodToApp={sendMethodToApp}
             />
         </div>
