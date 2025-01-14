@@ -113,7 +113,7 @@ export default function SideBar({ dataPoint, addDataPoint, sendMethodToApp }: Pr
                         {isLoading ? 'Processing...' : 'Upload image'}
                     </button>
                     <div className={classes.radioContainer}>
-                        <legend>Method</legend>
+                        <legend>Method:</legend>
                         <label>
                             <div className={classes.radioItem}>
                                 <div>tsne</div>
